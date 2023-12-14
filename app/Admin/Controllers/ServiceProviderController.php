@@ -7,6 +7,8 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\Utils;
+use Encore\Admin\Facades\Admin;
 use Carbon\Carbon;
 
 
@@ -44,39 +46,26 @@ class ServiceProviderController extends AdminController
             $filter->between('created_at', 'Filter by date registered')->date();
         });
 
-        $grid->model()->latest();
+      //show a user only their records if they are not an admin
+      if (!Admin::user()->inRoles(['administrator','ldf_admin'])) {
+          $grid->model()->where('user_id', Admin::user()->id);
+        }
+        //disable batch actions
+        $grid->disableBatchActions();
 
-        // $grid->column('id', __('Id'));
+        //order of table
+        $grid->model()->orderBy('id', 'desc');
+
+        //disable action buttons appropriately
+        Utils::disable_buttons('ServiceProvider', $grid);
+
         $grid->column('logo', __('Logo'))->image();
         $grid->column('name', __('Name'));
-        $grid->column('owner_name', __('Owner name'));
         $grid->column('class_of_service', __('Class of service'));
-        $grid->column('date_of_registration', __('Date of registration'));
         $grid->column('physical_address', __('Physical address'));
         $grid->column('primary_phone_number', __('Primary phone number'));
-        $grid->column('secondary_phone_number', __('Alternative phone number'));
         $grid->column('email', __('Email'));
-        $grid->column('postal_address', __('Postal address'));
-        $grid->column('other_services', __('Other services'));
-        $grid->column('distroict_of_operation', __('District of operation'));
-        // $grid->column('NDA_registration_number', __('NDA registration number'));
-        $grid->column('tin_number_business', __('Tin number business'));
-        $grid->column('tin_number_owner', __('Tin number owner'));
-        $grid->column('created_at', __('Created at'))->display(function ($x) {
-            $c = Carbon::parse($x);
-        if ($x == null) {
-            return $x;
-        }
-        return $c->format('d M, Y');
-        });
-        $grid->column('updated_at', __('Updated at'))->display(function ($x) {
-            $c = Carbon::parse($x);
-        if ($x == null) {
-            return $x;
-        }
-        return $c->format('d M, Y');
-        });
-
+      
         return $grid;
     }
 
@@ -89,8 +78,10 @@ class ServiceProviderController extends AdminController
     protected function detail($id)
     {
         $show = new Show(ServiceProvider::findOrFail($id));
+         //delete notification after viewing the form
+         Utils::delete_notification('ServiceProvider', $id);
 
-        $show->field('id', __('Id'));
+     
         $show->field('name', __('Name'));
         $show->field('owner_name', __('Owner name'));
         $show->field('owner_profile', __('Owner profile'));
@@ -104,13 +95,20 @@ class ServiceProviderController extends AdminController
         $show->field('other_services', __('Other services'));
         $show->field('logo', __('Logo'));
         $show->field('distroict_of_operation', __('Distroict of operation'));
-        $show->field('NDA_registration_number', __('NDA registration number'));
+        $show->field('NDA_registration_number', __('NDA registration number'))->file();
         $show->field('tin_number_business', __('Tin number business'));
         $show->field('tin_number_owner', __('Tin number owner'));
-        $show->field('license', __('License'));
+        $show->field('license', __('License'))->file();
         $show->field('other_documents', __('Other documents'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
+
+        
+        //disable tools
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableDelete();
+        });
 
         return $show;
     }
@@ -123,6 +121,16 @@ class ServiceProviderController extends AdminController
     protected function form()
     {
         $form = new Form(new ServiceProvider());
+        if($form->isCreating()){
+            $form->hidden('status')->default('Pending');
+            $form->hidden('user_id')->default(Admin::user()->id);
+        }
+        $form->tools(function (Form\Tools $tools) {
+            $tools->disableDelete();
+            $tools->disableView();
+           
+        });
+
 
         $form->text('name', __('Name'))->rules('required');
         $form->text('owner_name', __('Owner name'))->rules('required');
@@ -142,6 +150,11 @@ class ServiceProviderController extends AdminController
         $form->file('NDA_registration_number', __('NDA registration number'))->rules('required');
         $form->file('license', __('License'))->rules('required');
         $form->multipleFile('other_documents', __('Other documents'));
+
+        //check if the user is an admin and show the status field
+        if (Admin::user()->inRoles(['administrator','ldf_admin'])) {
+        $form->radioCard('status', __('Status'))->options(['halted' => 'Halted', 'approved' => 'Approved', 'rejected' => 'Rejected'])->rules('required');
+        }
 
         return $form;
     }

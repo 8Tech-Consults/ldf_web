@@ -3,52 +3,65 @@
 namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Dashboard;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Admin;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+   
     public function index(Content $content)
     {
-        $farmers = \App\Models\Farmer::count();
-        $cooperatives = \App\Models\Cooperative::count();
-        $farms = \App\Models\Farm::count();
-        $vets = \App\Models\Vet::count();
-        Admin::js('/adminlte/dist/js/pages/dashboard.js');
-
         return $content
-            ->title('Dashboard')
-            ->description('Welome to the Farm Management System')
-            ->view('dashboards.index', compact('farmers', 'cooperatives', 'farms', 'vets'));
-        
-        // return $content
-        //     ->title('Dashboard')
-        //     ->description('Description...')
-        //     ->row(Dashboard::title())
-        //     ->row(function (Row $row) {
+            ->title(__('Dashboard'))
+            ->row(function (Row $row) {
+                $row->column(12, function (Column $column) {
+                    $column->append(Dashboard::cards());
+                });
+            })
+            ->row(function (Row $row) {
+                $row->column(6, function (Column $column) {
+                    $column->append(Dashboard::liveStockHealth());
+                });
+                $row->column(6, function (Column $column) {
+                    $column->append(Dashboard::livestockBreed());
+                });
+           
+            })
 
-        //         $row->column(4, function (Column $column) {
-        //             $column->append(Dashboard::environment());
-        //         });
+            // ->row(function (Row $row) {
+            //     $row->column(12, function (Column $column) {
+            //         $column->append(Dashboard::productionMetrics());
+            //     });
+            // });
 
-        //         $row->column(4, function (Column $column) {
-        //             $column->append(Dashboard::extensions());
-        //         });
+           
 
-        //         $row->column(4, function (Column $column) {
-        //             $column->append(Dashboard::dependencies());
-        //         });
-        //     });
+            ->row(function (Row $row) {
+                $row->column(6, function (Column $column) {
+                    $column->append(Dashboard::financialSummary());
+                });
+                $row->column(6, function (Column $column) {
+                    $column->append(Dashboard::userMetrics(request()));
+                });
+            })
+            
+
+            ->row(function (Row $row) {
+                $row->column(6, function (Column $column) {
+                    $column->append(view('calendar'));
+                });
+            });
+
+
+     
     
     }
 
-    // protected $title = 'Dashboard';
-
-    // protected $description = 'Welome to the Farm Management System';
-
-    // protected function grid()
-    // {
-    //     return view('dashboards.index');
-    // }
+  
 
 }

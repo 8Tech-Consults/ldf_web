@@ -40,6 +40,11 @@ class AnimalHealthController extends AdminController
 
         $grid->model()->orderBy('date', 'desc');
 
+        //show a user only their records if they are not an admin
+        if (!auth()->user()->inRoles(['administrator','ldf_admin'])) {
+            $grid->model()->where('owner_id', auth()->user()->id);
+        }
+
         // $grid->column('id', __('Id'));
         $grid->column('date', __('Date'));
         $grid->column('record_type', __('Record type'));
@@ -47,20 +52,7 @@ class AnimalHealthController extends AdminController
         $grid->column('diagnosis', __('Diagnosis'));
         $grid->column('treatment', __('Treatment'));
         $grid->recordedBy()->name('Recorded by');
-        // $grid->column('created_at', __('Created at'))->display(function ($x) {
-        //     $c = Carbon::parse($x);
-        // if ($x == null) {
-        //     return $x;
-        // }
-        // return $c->format('d M, Y');
-        // });
-        // $grid->column('updated_at', __('Updated at'))->display(function ($x) {
-        //     $c = Carbon::parse($x);
-        // if ($x == null) {
-        //     return $x;
-        // }
-        // return $c->format('d M, Y');
-        // });
+        
 
         return $grid;
     }
@@ -96,16 +88,34 @@ class AnimalHealthController extends AdminController
     protected function form()
     {
         $form = new Form(new AnimalHealthRecord());
+        $user_id = auth()->user()->id;
+        $users_animals = \App\Models\Animal::where('owner_id', $user_id)->pluck('tag_number','id');
+        
 
         $form->text('record_type', __('Record type'))->rules('required');
         $form->date('date', __('Date'))->default(date('Y-m-d'))->rules('required');
-        $form->select('animal_id', __('Select Animal'))->options(\App\Models\Animal::pluck('tag_number','id'))->rules('required');
+        $form->select('animal_id', __('Select Animal'))->options($users_animals)->rules('required');
         $form->textarea('diagnosis', __('Diagnosis'));
         $form->textarea('treatment', __('Treatment'));
+        $form->select('status', __('Status'))->options(
+            ['Sick' => 'Sick', 
+            'Healthy' => 'Healthy',
+            'Recovered' => 'Recovered',
+            'Under Observation' => 'Under Observation',
+            'Euthanized' => 'Euthanized',
+            'Dead' => 'Dead',
+            'Unknown' => 'Unknown'
+
+            ])->rules('required');
         $form->hidden('recorded_by');
+        $form->hidden('owner_id');
 
         $form->saving(function (Form $form) {
             $form->recorded_by = auth()->user()->id;
+            //get the owner of the animal
+            $animal = \App\Models\Animal::find($form->animal_id);
+            $owner_id = $animal->owner_id;
+            $form->owner_id = $owner_id;
         });
 
         return $form;

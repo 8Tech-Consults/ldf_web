@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class FarmActivity extends Model
 {
     use HasFactory;
+    protected $fillable = [
+
+        'farm_id',
+        'start',
+        'end',
+        'title',
+        'user_id',
+        'description',
+        
+    ];
 
     public function farm()
     {

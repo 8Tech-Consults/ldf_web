@@ -36,7 +36,7 @@ class FarmController extends AdminController
             $f->between('created_at', 'Filter by date registered')->date();
         });
 
-        if(Admin::user()->isRole('ldf_admin') || Admin::user()->isRole('administrator') || Admin::user()->isRole('agent')) {
+        if(Admin::user()->isRole('ldf_admin') || Admin::user()->isRole('administrator')) {
             $grid->model()->latest();
         }else {
             $grid->model()->where('owner_id', Admin::user()->id)->latest();
@@ -50,12 +50,8 @@ class FarmController extends AdminController
         return $c->format('d M, Y');
         });
 
-        // $grid->column('profile_picture', __('Profile picture'))->image();
         $grid->column('name', __('Name'));
         $grid->location()->name('SubCounty');
-        $grid->column('village', __('Village'));
-        $grid->column('parish', __('Parish'));
-        $grid->column('zone', __('Zone'));
         $grid->column('production_type', __('Farm type'));
         $grid->column('date_of_establishment', __('Date of establishment'));
         $grid->column('breeds', __('Breeds'))
@@ -72,17 +68,7 @@ class FarmController extends AdminController
                 }
             }
         );
-        $grid->column('size', __('Land size (acres)'));
-        $grid->column('number_of_workers', __('Number of workers'));
-        $grid->column('land_ownership', __('Land ownership'));
-        $grid->column('no_land_ownership_reason', __('Type of land ownership'));
-         // $grid->column('updated_at', __('Updated at'))->display(function ($x) {
-        //     $c = Carbon::parse($x);
-        // if ($x == null) {
-        //     return $x;
-        // }
-        // return $c->format('d M, Y');
-        // });
+        
 
         return $grid;
     }
@@ -97,18 +83,23 @@ class FarmController extends AdminController
     {
         $show = new Show(Farm::findOrFail($id));
 
-        $show->field('id', __('Id'));
+        $show->field('profile_picture', __('Farm image'))->as(function ($profile_picture) {
+            if ($profile_picture == null) {
+                return 'No image';
+            }
+            return "<img src='/storage/$profile_picture' width='800px' height='400px' />";
+        })->unescape();
         $show->field('name', __('Name'));
-        $show->field('location_id', __('SubCounty'));
+        $show->field('location_id', __('SubCounty'))->as(function ($location_id) {
+            return \App\Models\Location::find($location_id)->name;
+        });
         $show->field('village', __('Village'));
         $show->field('parish', __('Parish'));
         $show->field('zone', __('Zone'));
-        $show->field('livestock_type', __('Livestock type'));
         $show->field('production_type', __('Farm type'));
         $show->field('date_of_establishment', __('Date of establishment'));
         $show->field('size', __('Land size'));
-        $show->field('profile_picture', __('Profile picture'));
-        $show->field('number_of_livestock', __('Number of livestock'));
+       
         $show->field('number_of_workers', __('Number of workers'));
         $show->field('land_ownership', __('Land ownership'));
         $show->field('general_remarks', __('General remarks'));
@@ -127,9 +118,28 @@ class FarmController extends AdminController
     {
         $form = new Form(new Farm());
 
-        $form->image('profile_picture', __('Profile picture'));
+        $form->image('profile_picture', __('Farm image'));
         $form->text('name', __('Name'))->rules('required');
-        $form->text('coordinates', __('Coordinates'))->placeholder('lat, lng')->help('e.g. 0.000000, 0.000000');
+         //  //add a get gps coordinate button
+         $form->html('<button type="button" id="getLocationButton">' . __('Get GPS Coordinates') . '</button>');
+
+         $form->text('coordinates', __('Location '))->attribute([
+             'id' => 'coordinates',   
+         ])->required();
+      
+         
+         //script to get the gps coordinates
+         Admin::script(<<<SCRIPT
+             document.getElementById('getLocationButton').addEventListener('click', function() {
+                 if ("geolocation" in navigator) {
+                     navigator.geolocation.getCurrentPosition(function(position) {
+                         document.getElementById('coordinates').value = position.coords.latitude + ', ' + position.coords.longitude;
+                     });
+                 } else {
+                     alert('Geolocation is not supported by your browser.');
+                 }
+             });
+         SCRIPT);
         $form->select('location_id', __('SubCounty'))->options(\App\Models\Location::where('parent','!=',0)->pluck('name', 'id'))->rules('required');
         $form->text('village', __('Village'));
         $form->text('parish', __('Parish'));

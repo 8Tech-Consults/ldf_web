@@ -39,6 +39,11 @@ class AnimalController extends AdminController
 
         $grid->model()->orderBy('updated_at', 'desc');
 
+        //show a user only their records if they are not an admin
+        if (!auth()->user()->inRoles(['administrator','ldf_admin'])) {
+            $grid->model()->where('owner_id', auth()->user()->id);
+        }
+
         // $grid->column('id', __('Id'));
         $grid->column('tag_number', __('Tag Number'));
         $grid->farm()->name('Farm');
@@ -47,13 +52,6 @@ class AnimalController extends AdminController
         $grid->column('dob', __('Dob'));
         $grid->column('date_of_weaning', __('Date of weaning'));
         $grid->column('created_at', __('Created at'))->display(function ($x) {
-            $c = Carbon::parse($x);
-        if ($x == null) {
-            return $x;
-        }
-        return $c->format('d M, Y');
-        });
-        $grid->column('updated_at', __('Updated at'))->display(function ($x) {
             $c = Carbon::parse($x);
         if ($x == null) {
             return $x;
@@ -74,15 +72,18 @@ class AnimalController extends AdminController
     {
         $show = new Show(Animal::findOrFail($id));
 
-        // $show->field('id', __('Id'));
+        
         $show->field('tag_number', __('Tag Number'));
-        $show->field('farm_id', __('Farm id'));
-        $show->field('breed_id', __('Breed id'));
+        $show->field('farm_id', __('Farm id'))->as(function ($farm_id) {
+            return \App\Models\Farm::find($farm_id)->name;
+        });
+        $show->field('breed_id', __('Breed id'))->as(function ($breed_id) {
+            return \App\Models\Breed::find($breed_id)->name;
+        });
         $show->field('parents', __('Parents'));
         $show->field('dob', __('Dob'));
         $show->field('date_of_weaning', __('Date of weaning'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
+      
 
         return $show;
     }
@@ -95,13 +96,18 @@ class AnimalController extends AdminController
     protected function form()   
     {
         $form = new Form(new Animal());
-
-        $form->select('farm_id', __('Select Farm'))->options(\App\Models\Farm::pluck('name', 'id'))->rules('required');
+       
+        //get users farms
+        $user_id = auth()->user()->id;
+        $farms = \App\Models\Farm::where('owner_id', $user_id)->pluck('name', 'id');
+     
+        $form->select('farm_id', __('Select Farm'))->options($farms)->rules('required');
         $form->text('tag_number', __('Tag Number'));
         $form->select('breed_id', __('Select Breed'))->options(\App\Models\Breed::pluck('name', 'id'))->rules('required');
         $form->text('parents', __('Parents')); //TODO: Add a select2 dropdown for this
         $form->datetime('dob', __('Date Of Birth'));
         $form->date('date_of_weaning', __('Date of weaning'));
+        $form->hidden('owner_id')->default($user_id);
 
         $form->saving(function (Form $form) {
             // Check if the tag number, breed and farm combination already exists
@@ -109,6 +115,7 @@ class AnimalController extends AdminController
                 admin_error('Animal already exists', 'Please check the tag number, breed and farm combination.');
                 return back();
             }
+            
         });
 
         return $form;

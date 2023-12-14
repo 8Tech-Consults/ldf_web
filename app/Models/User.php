@@ -10,6 +10,8 @@ use App\Models\AdminRole;
 
 class User extends Administrator
 {
+    protected $table = 'admin_users';
+
     public static function getAgents()
     {
         return User::whereHas('roles', function ($query) {

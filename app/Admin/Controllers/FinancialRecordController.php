@@ -28,19 +28,23 @@ class FinancialRecordController extends AdminController
     {
         $grid = new Grid(new FinancialRecord());
 
-        $grid->column('id', __('Id'));
-        $grid->column('farm_id', __('Farm id'));
-        $grid->column('farmer_id', __('Farmer id'));
+        $grid->model()->orderBy('updated_at', 'desc');
+
+         //show a user only their records if they are not an admin
+         if (!auth()->user()->inRoles(['administrator','ldf_admin'])) {
+            $grid->model()->where('farmer_id', auth()->user()->id);
+        }
+
+    
+        $grid->column('farm_id', __('Farm'))->display(function ($farm_id) {
+            return \App\Models\Farm::find($farm_id)?->name;
+        });
+    
         $grid->column('transaction_type', __('Transaction type'));
         $grid->column('transaction_date', __('Transaction date'));
-        $grid->column('description', __('Description'));
         $grid->column('amount', __('Amount'));
         $grid->column('payment_method', __('Payment method'));
-        $grid->column('party', __('Party'));
-        $grid->column('party_tin', __('Party tin'));
-        $grid->column('payment_reference', __('Payment reference'));
-        $grid->column('reciept_file', __('Reciept file'));
-        $grid->column('remarks', __('Remarks'));
+     
         $grid->column('created_at', __('Created at'))->display(function ($x) {
             $c = Carbon::parse($x);
         if ($x == null) {
@@ -48,13 +52,7 @@ class FinancialRecordController extends AdminController
         }
         return $c->format('d M, Y');
         });
-        $grid->column('updated_at', __('Updated at'))->display(function ($x) {
-            $c = Carbon::parse($x);
-        if ($x == null) {
-            return $x;
-        }
-        return $c->format('d M, Y');
-        });
+        
 
         return $grid;
     }
@@ -69,9 +67,10 @@ class FinancialRecordController extends AdminController
     {
         $show = new Show(FinancialRecord::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('farm_id', __('Farm id'));
-        $show->field('farmer_id', __('Farmer id'));
+        $show->field('farm_id', __('Farm id'))->as(function ($farm_id) {
+            return \App\Models\Farm::find($farm_id)?->name;
+        });
+
         $show->field('transaction_type', __('Transaction type'));
         $show->field('transaction_date', __('Transaction date'));
         $show->field('description', __('Description'));
@@ -97,10 +96,9 @@ class FinancialRecordController extends AdminController
     {
         $form = new Form(new FinancialRecord());
 
-        // $form->number('farm_id', __('Farm id'));
+        $form->hidden('farmer_id', __('Farm id'))->default(auth()->user()->id);
         $form->select('farm_id', __('Select Farm'))->options(\App\Models\Farm::pluck('name', 'id'));
-        // $form->number('farmer_id', __('Farmer id'));
-        $form->text('transaction_type', __('Transaction type'));
+        $form->select('transaction_type', __('Transaction type'))->options(['Income' => 'Income', 'Expense' => 'Expense']);
         $form->date('transaction_date', __('Transaction date'))->default(date('Y-m-d'));
         $form->textarea('description', __('Description'));
         $form->decimal('amount', __('Amount'));
@@ -110,6 +108,8 @@ class FinancialRecordController extends AdminController
         $form->text('payment_reference', __('Payment reference'));
         $form->text('reciept_file', __('Reciept file'));
         $form->textarea('remarks', __('Remarks'));
+
+        
 
         return $form;
     }

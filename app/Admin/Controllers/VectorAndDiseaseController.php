@@ -76,9 +76,9 @@ class VectorAndDiseaseController extends AdminController
         $show->field('farm_id', __('Farm'))->as(function ($farm_id) {
             return \App\Models\Farm::find($farm_id)?->name;
         });
-        $show->field('animal_id', __('Animal'))->as(function ($animal_id) {
-            return \App\Models\Animal::find($animal_id)?->tag_number;
-        });
+        // $show->field('animal_id', __('Animal'))->as(function ($animal_id) {
+        //     return \App\Models\Animal::find($animal_id)?->tag_number;
+        // });
         // $show->field('id', __('Id'));
         $show->field('name', __('Name'));
         $show->image()->image();
@@ -97,9 +97,14 @@ class VectorAndDiseaseController extends AdminController
     protected function form()
     {
         $form = new Form(new VectorAndDisease());
+
+         //get users farms
+         $user_id = auth()->user()->id;
+         $farms = \App\Models\Farm::where('owner_id', $user_id)->pluck('name', 'id');
+
         $form->date('date', __('Date'))->default(date('Y-m-d'))->rules('required');
-        $form->select('farm_id', __('Farm'))->options(\App\Models\Farm::pluck('name', 'id'))->rules('required');
-        $form->select('animal_id', __('Animal'))->options(\App\Models\Animal::pluck('tag_number', 'id'));
+        $form->select('farm_id', __('Farm'))->options($farms)->rules('required');
+       // $form->select('animal_id', __('Animal'))->options(\App\Models\Animal::pluck('tag_number', 'id'));
         $form->text('name', __('Name'))->rules('required');
         $form->image('image', __('Image'));
         $form->textarea('description', __('Description'));
