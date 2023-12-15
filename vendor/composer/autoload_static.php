@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262
+class ComposerStaticInitd0892da1b4a96a16ad211d3f7982eb13
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -371,8 +371,8 @@ class ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-factory/src',
-            1 => __DIR__ . '/..' . '/psr/http-message/src',
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+            1 => __DIR__ . '/..' . '/psr/http-factory/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -600,6 +600,7 @@ class ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\FarmActivityController' => __DIR__ . '/../..' . '/app/Http/Controllers/FarmActivityController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -610,11 +611,14 @@ class ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\ValidateSignature' => __DIR__ . '/../..' . '/app/Http/Middleware/ValidateSignature.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
+        'App\\Mail\\MyNotification' => __DIR__ . '/../..' . '/app/Mail/MyNotification.php',
         'App\\Models\\AdminRole' => __DIR__ . '/../..' . '/app/Models/AdminRole.php',
+        'App\\Models\\AdminRoleUser' => __DIR__ . '/../..' . '/app/Models/AdminRoleUser.php',
         'App\\Models\\Animal' => __DIR__ . '/../..' . '/app/Models/Animal.php',
         'App\\Models\\AnimalHealthRecord' => __DIR__ . '/../..' . '/app/Models/AnimalHealthRecord.php',
         'App\\Models\\Breed' => __DIR__ . '/../..' . '/app/Models/Breed.php',
         'App\\Models\\Cooperative' => __DIR__ . '/../..' . '/app/Models/Cooperative.php',
+        'App\\Models\\Dashboard' => __DIR__ . '/../..' . '/app/Models/Dashboard.php',
         'App\\Models\\District' => __DIR__ . '/../..' . '/app/Models/District.php',
         'App\\Models\\Farm' => __DIR__ . '/../..' . '/app/Models/Farm.php',
         'App\\Models\\FarmActivity' => __DIR__ . '/../..' . '/app/Models/FarmActivity.php',
@@ -623,10 +627,12 @@ class ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262
         'App\\Models\\LivestockType' => __DIR__ . '/../..' . '/app/Models/LivestockType.php',
         'App\\Models\\Location' => __DIR__ . '/../..' . '/app/Models/Location.php',
         'App\\Models\\Media' => __DIR__ . '/../..' . '/app/Models/Media.php',
+        'App\\Models\\Notification' => __DIR__ . '/../..' . '/app/Models/Notification.php',
         'App\\Models\\ProductionRecord' => __DIR__ . '/../..' . '/app/Models/ProductionRecord.php',
         'App\\Models\\ServiceProvider' => __DIR__ . '/../..' . '/app/Models/ServiceProvider.php',
         'App\\Models\\Status' => __DIR__ . '/../..' . '/app/Models/Status.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
+        'App\\Models\\Utils' => __DIR__ . '/../..' . '/app/Models/Utils.php',
         'App\\Models\\VectorAndDisease' => __DIR__ . '/../..' . '/app/Models/VectorAndDisease.php',
         'App\\Models\\Vet' => __DIR__ . '/../..' . '/app/Models/Vet.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
@@ -7344,9 +7350,9 @@ class ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit8d99f0b1d4ed9d1cb73c13c83f7fd262::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd0892da1b4a96a16ad211d3f7982eb13::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd0892da1b4a96a16ad211d3f7982eb13::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitd0892da1b4a96a16ad211d3f7982eb13::$classMap;
 
         }, null, ClassLoader::class);
     }
