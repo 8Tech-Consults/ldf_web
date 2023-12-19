@@ -1,4 +1,5 @@
 <?php
+die("as");
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
