@@ -11,4 +11,7 @@ use Illuminate\Http\Request;
 Route::view('/', function () {
     die('hello');
 });
+Route::view('/test', function () {
+    die('hello');
+});
 Route::view('auth/register', 'auth.register');
