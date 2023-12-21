@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
 
-    <base href="{{ url('around') }}/">
+    <base href="{{ url('') }}/">
     <!-- Viewport -->
     <meta name="viewport"
         content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
@@ -18,7 +18,7 @@
     <!-- Webmanifest + Favicon / App icons -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="{{ url('assets/img/logo.png') }}" sizes="32x32">
-    <link rel="apple-touch-icon" href="{{ url('assets/img/logo.png') }}"">
+    <link rel="apple-touch-icon" href="{{ url('assets/img/logo.png') }}">
 
     <!-- Theme switcher (color modes) -->
     <script src="{{ url('around') }}/assets/js/theme-switcher.js"></script>
