@@ -11,27 +11,19 @@ Route::group([
     'as'            => config('admin.route.prefix') . '.',
 ], function (Router $router) {
 
-
     $router->get('/', 'HomeController@index')->name('home');
-    $router->resource('meetings', MeetingController::class);
-    $router->resource('companies', CompanyController::class);
-    $router->resource('departments', DepartmentController::class);
-    $router->resource('clients', ClientController::class);
-    $router->resource('employees', EmployeesController::class);
-    $router->resource('admin-roles', AdminRoleController::class);
-    $router->resource('projects', ProjectController::class);
-    $router->resource('project-sections', ProjectSectionController::class);
-    /*     $router->resource('daily-tasks', TaskController::class);
-    $router->resource('weekly-tasks', TaskController::class);
-    $router->resource('montly-tasks', TaskController::class); */
-    $router->resource('tasks-pending', TaskController::class);
-    $router->resource('tasks', TaskController::class);
-    $router->resource('events', EventController::class);
-    $router->get('/calendar', 'HomeController@calendar')->name('calendar');
-    $router->resource('patients', PatientController::class);
-    $router->resource('patient-records', PatientRecordController::class);
-    $router->resource('treatment-records', TreatmentRecordController::class);
-    $router->resource('treatment-record-items', TreatmentRecordItemController::class);
-
-    $router->resource('gens', GenController::class);
+    $router->resource('users', UserController::class);
+    $router->resource('farms', FarmController::class);
+    $router->resource('farmers', FarmerController::class);
+    $router->resource('breeds', BreedController::class);
+    $router->resource('animals', AnimalController::class);
+    $router->resource('animal-health-records', AnimalHealthController::class);
+    $router->resource('vector-and-diseases', VectorAndDiseaseController::class);
+    $router->resource('vets', VetController::class);
+    $router->resource('service-providers', ServiceProviderController::class);
+    $router->resource('production-records', ProductionController::class);
+    $router->resource('financial-records', FinancialRecordController::class);
+    $router->resource('farm-activities', FarmActivityController::class);
+    $router->resource('livestock-types', LivestockTypeController::class);
+    $router->resource('cooperatives', CooperativeController::class);
 });

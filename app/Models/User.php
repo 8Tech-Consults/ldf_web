@@ -2,63 +2,48 @@
 
 namespace App\Models;
 
-use Encore\Admin\Form\Field\BelongsToMany;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany as RelationsBelongsToMany;
-use Laravel\Sanctum\HasApiTokens;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Encore\Admin\Auth\Database\Administrator;
+use DB;
+use App\Models\AdminRole;
 
-
-class User extends Authenticatable implements JWTSubject
+class User extends Administrator
 {
-    use HasFactory;
-    use Notifiable;
+    protected $table = 'admin_users';
 
-
-
-    public static function update_rating($id)
+    public static function getAgents()
     {
-        $user = User::find($id);
-        $tasks = Task::where('assigned_to', $id)->get();
-        $rate = 0;
-        $count = 0;
-        foreach ($tasks as $task) {
-            if ($task->manager_submission_status != 'Not Submitted') {
-                $rate += $task->rate;
-                $count++;
-            }
+        return User::whereHas('roles', function ($query) {
+            $query->where('slug', 'agent');
+        })->get();
+    }
+
+    public function assignRole(String $role, bool $clearPrevious = true)
+    {
+        $role = AdminRole::where('slug', $role)->first();
+
+        if ($clearPrevious) {
+            DB::table('admin_role_users')->where('user_id', $this->id)->delete();
         }
-        if ($count > 0) {
-            $rate = $rate / $count;
-        }
-        $user->rate = $rate;
-        $user->save();
+        DB::table('admin_role_users')->insert([
+            'role_id' => $role->id,
+            'user_id' => $this->id
+        ]);
     }
 
+    // public function hasRole(String $role) 
+    // {
+    //     $role = AdminRole::where('slug', $role)->first();
+    //     return DB::table('admin_role_users')->where([
+    //         'role_id' => $role->id,
+    //         'user_id' => $this->id
+    //     ])->exists();
 
-    protected $table = "admin_users";
+    // }
 
-    public function getJWTIdentifier()
+    public function farmersInspected()
     {
-        return $this->getKey();
-    }
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
-
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
-
-    public function tasks()
-    {
-        return $this->hasMany(Task::class, 'assigned_to');
+        return $this->hasMany(Farmer::class, 'agent_id');
     }
 }

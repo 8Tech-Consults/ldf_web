@@ -30,12 +30,12 @@
                         <div class="pb-3 mb-3">
                             <div class="position-relative">
                                 <i class="ai-mail fs-lg position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                                <input class="form-control form-control-lg ps-5 {!! !$errors->has('username') ?: 'border-danger' !!} " type="email"
-                                    name="username" id="username" value="{{ old('username') }}" placeholder="Email address"
+                                <input class="form-control form-control-lg ps-5 {!! !$errors->has('email') ?: 'border-danger' !!} " type="email"
+                                    name="email" id="email" value="{{ old('email') }}" placeholder="Email address"
                                     required>
 
-                                @if ($errors->has('username'))
-                                    @foreach ($errors->get('username') as $message)
+                                @if ($errors->has('email'))
+                                    @foreach ($errors->get('email') as $message)
                                         <label class="control-label text-danger" for="inputError"><i
                                                 class="fa fa-times-circle-o"></i>
                                             <li>{{ $message }}</li>

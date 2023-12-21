@@ -143,8 +143,7 @@ class ApiAuthController extends Controller
 
         $r->username = trim($r->username);
 
-        $u = User::where('phone_number_1', $r->username)
-            ->orWhere('username', $r->username)
+        $u = User::where('username', $r->username)
             ->orWhere('id', $r->username)
             ->orWhere('email', $r->username)
             ->first();
@@ -154,8 +153,7 @@ class ApiAuthController extends Controller
             $phone_number = Utils::prepare_phone_number($r->username);
             if (Utils::phone_number_is_valid($phone_number)) {
                 $phone_number = $r->phone_number;
-                $u = User::where('phone_number_1', $phone_number)
-                    ->orWhere('username', $phone_number)
+                $u = User::where('username', $phone_number)
                     ->orWhere('email', $phone_number)
                     ->first();
             }
