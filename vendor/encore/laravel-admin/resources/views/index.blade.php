@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="renderer" content="webkit">
+    {{-- base url --}}
+    <base href="{{ url('/') }}">
+    {{-- CSRF Token --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ Admin::title() }} @if ($header)
             | {{ $header }}
