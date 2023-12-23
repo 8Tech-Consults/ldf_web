@@ -26,4 +26,6 @@ Route::group([
     $router->resource('farm-activities', FarmActivityController::class);
     $router->resource('livestock-types', LivestockTypeController::class);
     $router->resource('cooperatives', CooperativeController::class);
+    $router->resource('gens', GenController::class); 
+    $router->resource('diseases', DiseaseController::class);
 });

@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddCcompanyIdToEvents extends Migration
+class CreateFinanceAccountsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,16 +13,16 @@ class AddCcompanyIdToEvents extends Migration
      */
     public function up()
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->foreignIdFor(Company::class);
+        Schema::create('finance_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->integer('owner_id')->nullable();
             $table->text('name')->nullable();
-            $table->text('event_conducted')->nullable();
+            $table->text('balance')->nullable();
+            $table->text('detail')->nullable();
         });
     }
-    /* 				
-outcome	
 
-*/
     /**
      * Reverse the migrations.
      *
@@ -31,8 +30,6 @@ outcome
      */
     public function down()
     {
-        Schema::table('events', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('finance_accounts');
     }
 }

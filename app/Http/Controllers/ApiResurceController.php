@@ -12,6 +12,7 @@ use App\Models\GardenActivity;
 use App\Models\Group;
 use App\Models\Institution;
 use App\Models\Job;
+use App\Models\Location;
 use App\Models\NewsPost;
 use App\Models\Person;
 use App\Models\Product;
@@ -23,6 +24,7 @@ use Carbon\Carbon;
 use Encore\Admin\Auth\Database\Administrator;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class ApiResurceController extends Controller
@@ -30,10 +32,21 @@ class ApiResurceController extends Controller
 
     use ApiResponser;
 
-    public function saccos(Request $r)
+    public function locations(Request $r)
     {
+        $locations = [];
+
+        foreach (Location::where([
+            'details' => 'Subcounty'
+        ])->orderby('id', 'desc')
+            ->get() as $key => $district) {
+            $loc['id'] = $district->id;
+            $loc['name'] = $district->name;
+            $locations[] = $loc;
+        }
+
         return $this->success(
-            Sacco::where([])->orderby('id', 'desc')->get(),
+            $locations,
             $message = "Sussesfully",
             200
         );
@@ -146,7 +159,7 @@ class ApiResurceController extends Controller
             return $this->error('User not found.');
         }
         $member = Administrator::find($r->member_id);
-        if($member == null){
+        if ($member == null) {
             return $this->error('Member not found.');
         }
         $member->sacco_join_status = $r->sacco_join_status;
@@ -465,6 +478,7 @@ class ApiResurceController extends Controller
             unset($_GET['_method']);
         }
 
+
         $conditions = [];
         foreach ($_GET as $k => $v) {
             if (substr($k, 0, 2) == 'q_') {
@@ -479,10 +493,8 @@ class ApiResurceController extends Controller
             }
         }
         if ($is_private) {
-
             $u = $r->user;
             $administrator_id = $u->id;
-
             if ($u == null) {
                 return $this->error('User not found.');
             }
@@ -567,10 +579,8 @@ class ApiResurceController extends Controller
 
     public function update(Request $r, $model)
     {
-        $administrator_id = Utils::get_user_id($r);
-        $u = Administrator::find($administrator_id);
 
-
+        $u = auth('api')->user();        
         if ($u == null) {
             return Utils::response([
                 'status' => 0,
@@ -578,35 +588,56 @@ class ApiResurceController extends Controller
             ]);
         }
 
-
         $className = "App\Models\\" . $model;
-        $id = ((int)($r->online_id));
+        $id = ((int)($r->id));
         $obj = $className::find($id);
 
-
+        $isEdit = true;
         if ($obj == null) {
-            return Utils::response([
-                'status' => 0,
-                'message' => "Item not found.",
-            ]);
+            $obj = new $className;
+            $isEdit = false;
         }
 
+        $table_name = $obj->getTable();
+        $cols = Schema::getColumnListing($table_name);
+        
+   
 
-        unset($_POST['_method']);
         if (isset($_POST['online_id'])) {
             unset($_POST['online_id']);
         }
 
+        $except = [
+            'created_at',
+            'updated_at',
+            'deleted_at',
+            'online_id',
+            'id',
+            'administrator_id',
+            'user_id',
+            'created_by',
+            'updated_by',
+        ];
+
         foreach ($_POST as $key => $value) {
+            if(in_array($key, $except)){
+                continue;
+            }
+            if(!in_array($key, $cols)){
+                continue;
+            }
             $obj->$key = $value;
         }
 
-
         $success = false;
         $msg = "";
+        if($isEdit){
+            $msg = "Updated successfully.";
+        }else{
+            $msg = "Created successfully.";
+        }
         try {
             $obj->save();
-            $msg = "Updated successfully.";
             $success = true;
         } catch (Exception $e) {
             $success = false;

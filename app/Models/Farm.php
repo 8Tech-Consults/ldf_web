@@ -9,6 +9,34 @@ class Farm extends Model
 {
     use HasFactory;
 
+
+    //boot
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->owner_id = $model->owner_id ?? auth()->user()->id;
+            $sub = Location::find($model->location_id);
+            if($sub == null){
+                throw new \Exception("Location not found");
+            }
+            $model->district_id = $sub->parent;
+        });
+    }
+
+    //appends for location_text
+    protected $appends = ['sub_county_text'];
+    //getter for sub_county_text
+    public function getSubCountyTextAttribute()
+    {
+        $sub = Location::find($this->location_id);
+        if ($sub == null) {
+            return "N/A";
+        }
+        return $sub->name;
+    }
+
     protected $guarded = [];
 
     public function animals()

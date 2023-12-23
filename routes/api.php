@@ -6,32 +6,22 @@ use App\Http\Middleware\EnsureTokenIsValid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+
+
+Route::get('locations', [ApiResurceController::class, 'locations']);
 
 
 Route::middleware([EnsureTokenIsValid::class])->group(function () {
 });
+
 Route::get('users/me', [ApiAuthController::class, 'me']);
 Route::get('users', [ApiAuthController::class, 'users']);
-Route::get('tasks', [ApiAuthController::class, 'tasks']);
-Route::get('projects', [ApiAuthController::class, 'projects']);
-Route::POST("tasks-update-status", [ApiAuthController::class, 'tasks_update_status']);
-Route::POST("post-media-upload", [ApiAuthController::class, 'upload_media']);
-Route::POST("meetings", [ApiAuthController::class, 'meetings_post']);
-Route::POST("tasks-create", [ApiAuthController::class, 'tasks_create']);
+
 
 Route::POST("users/login", [ApiAuthController::class, "login"]);
 Route::POST("users/register", [ApiAuthController::class, "register"]);
 Route::get('api/{model}', [ApiResurceController::class, 'index']);
+Route::post('api/{model}', [ApiResurceController::class, 'update']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

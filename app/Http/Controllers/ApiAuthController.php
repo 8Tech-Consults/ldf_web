@@ -21,28 +21,7 @@ class ApiAuthController extends Controller
 
     use ApiResponser;
 
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
 
-        /* $token = auth('api')->attempt([
-            'username' => 'admin',
-            'password' => 'admin',
-        ]);
-        die($token); */
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
-    }
-
-
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function me()
     {
         $query = auth('api')->user();
@@ -61,72 +40,6 @@ class ApiAuthController extends Controller
             'company_id' => $u->company_id
         ])->get(), $message = "Success", 200);
     }
-
-    public function projects()
-    {
-        $u = auth('api')->user();
-        if ($u == null) {
-            return $this->error('Account not found');
-        }
-        return $this->success(Project::where([
-            'company_id' => $u->company_id
-        ])
-            ->get(), $message = "Success =>{$u->company_id}<=", 200);
-    }
-
-    public function tasks()
-    {
-        $u = auth('api')->user();
-        if ($u == null) {
-            return $this->error('Account not found');
-        }
-        return $this->success(Task::where([
-            'assigned_to' => $u->id,
-        ])
-            ->orWhere([
-                'manager_id' => $u->id,
-            ])
-            ->get(), $message = "Success", 200);
-    }
-
-    public function tasks_update_status(Request $r)
-    {
-        $u = auth('api')->user();
-        if ($u == null) {
-            return $this->error('Account not found');
-        }
-
-        if ($r->task_id == null) {
-            return $this->error('Task ID is required.');
-        }
-
-
-        $task = Task::find($r->task_id);
-        if ($task == null) {
-            return $this->error('Task not found. ' . $r->task_id);
-        }
-        if (strlen($r->delegate_submission_status) > 2) {
-            $task->delegate_submission_status = $r->delegate_submission_status;
-        }
-        if (strlen($r->manager_submission_status) > 2) {
-            $task->manager_submission_status = $r->manager_submission_status;
-        }
-        if (strlen($r->delegate_submission_remarks) > 2) {
-            $task->delegate_submission_remarks = $r->delegate_submission_remarks;
-        }
-        if (strlen($r->manager_submission_remarks) > 2) {
-            $task->manager_submission_remarks = $r->manager_submission_remarks;
-        }
-
-        try {
-            $task->save();
-        } catch (\Throwable $th) {
-            return $this->error('Failed to update task.');
-        }
-
-        return $this->success(null, $message = "Success", 200);
-    }
-
 
 
 
@@ -175,8 +88,6 @@ class ApiAuthController extends Controller
         if ($token == null) {
             return $this->error('Wrong credentials.');
         }
-
-
 
         $u->token = $token;
         $u->remember_token = $token;
@@ -269,154 +180,6 @@ class ApiAuthController extends Controller
         $new_user->token = $token;
         $new_user->remember_token = $token;
         return $this->success($new_user, 'Account created successfully.');
-    }
-
-
-    public function meetings_post(Request $r)
-    {
-        $u = auth('api')->user();
-        if ($u == null) {
-            return Utils::response([
-                'status' => 0,
-                'code' => 0,
-                'message' => "User not found.",
-            ]);
-        }
-
-        if ($r->gps_latitude == null) {
-            return Utils::response([
-                'status' => 0,
-                'code' => 0,
-                'message' => "GPS latitude is required.",
-            ]);
-        }
-
-
-        if ($r->resolutions == null) {
-            return Utils::response([
-                'status' => 0,
-                'code' => 0,
-                'message' => "Resolutions are required.",
-            ]);
-        }
-
-
-
-
-        $meeting = new Meeting();
-        $meeting->name = $r->gps_latitude;
-        $meeting->company_id = $u->company_id;
-        $meeting->created_by = $u->id;
-        $meeting->minutes_of_meeting = $r->details;
-        $meeting->details = $r->details;
-        $meeting->meeting_start_time = Carbon::parse($r->created_at);
-        $start_date = Carbon::parse($r->start_date);
-        $end_date = Carbon::parse($r->end_date);
-        $meeting->meeting_start_time = $meeting->meeting_start_time->addHours($start_date->hour)->addMinutes($start_date->minute);
-        $meeting->meeting_end_time = $meeting->meeting_start_time->addHours($end_date->hour)->addMinutes($end_date->minute);
-        $meeting->other_data = $r->location_text;
-        $meeting->location_gps_latitude = $r->location_gps_latitude;
-
-        $images = [];
-        foreach (Image::where([
-            'parent_id' => $r->id,
-        ])->get() as $key => $value) {
-            $images[] = 'images/' . $value->src;
-        }
-        $meeting->attendance_list_pictures = $images;
-
-        $message = "";
-        try {
-            $meeting->save();
-            $_resolutions = [];
-            if (strlen($r->resolutions) > 2) {
-                try {
-                    $_resolutions = json_decode($r->resolutions);
-                } catch (\Throwable $th) {
-                    return Utils::response([
-                        'status' => 0,
-                        'code' => 0,
-                        'message' => "Failed to parse resolutions.",
-                    ]);
-                }
-            }
-
-            foreach ($_resolutions as $key => $val) {
-                $task = new Task();
-                $task->company_id = $u->id;
-                $task->meeting_id = $meeting->id;
-                $task->assigned_to = $val->attribute_5;
-                $task->manager_id = $val->attribute_7;
-                $task->project_id = $val->attribute_9;
-                $task->created_by = $u->id;
-                $task->name = $val->attribute_2;
-                $task->task_description = $val->attribute_3;
-                $task->due_to_date = Carbon::parse($val->attribute_4);
-                $task->priority = 'Medium';
-                $task->save();
-            }
-        } catch (\Throwable $th) {
-            $message = $th->getMessage();
-            return Utils::response([
-                'status' => 0,
-                'code' => 0,
-                'message' => $message,
-            ]);
-        }
-
-        $meeting->send_mails();
-
-        return Utils::response([
-            'status' => 1,
-            'code' => 1,
-            'message' => 'Meeting created successfully.',
-        ]);
-    }
-
-
-
-
-    public function tasks_create(Request $val)
-    {
-        $u = auth('api')->user();
-        if ($u == null) {
-            return Utils::response([
-                'status' => 0,
-                'code' => 0,
-                'message' => "User not found.",
-            ]);
-        }
-
-        $message = "";
-        try {
-            $task = new Task();
-            $task->company_id = $u->id;
-            $task->meeting_id = null;
-            $task->assigned_to = $val->attribute_5;
-            $task->manager_id = $val->attribute_7;
-            $task->project_id = $val->attribute_9;
-            $task->created_by = $u->id;
-            $task->name = $val->attribute_2;
-            $task->task_description = $val->attribute_3;
-            $task->due_to_date = Carbon::parse($val->attribute_4);
-            $task->priority = 'Medium';
-            $task->save();
-        } catch (\Throwable $th) {
-            $message = $th->getMessage();
-            return Utils::response([
-                'status' => 0,
-                'code' => 0,
-                'message' => $message,
-            ]);
-        }
-
-
-
-        return Utils::response([
-            'status' => 1,
-            'code' => 1,
-            'message' => 'Meeting created successfully.',
-        ]);
     }
 
 
