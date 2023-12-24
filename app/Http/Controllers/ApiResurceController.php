@@ -580,7 +580,7 @@ class ApiResurceController extends Controller
     public function update(Request $r, $model)
     {
 
-        $u = auth('api')->user();        
+        $u = auth('api')->user();
         if ($u == null) {
             return Utils::response([
                 'status' => 0,
@@ -597,11 +597,22 @@ class ApiResurceController extends Controller
             $obj = new $className;
             $isEdit = false;
         }
+        if ($isEdit) {
+            if (isset($r->my_task)) {
+                if ($r->my_task == 'delete') {
+                    $obj->delete();
+                    return Utils::response([
+                        'status' => 1,
+                        'message' => "Deleted successfully.",
+                    ]);
+                }
+            }
+        }
 
         $table_name = $obj->getTable();
         $cols = Schema::getColumnListing($table_name);
-        
-   
+
+
 
         if (isset($_POST['online_id'])) {
             unset($_POST['online_id']);
@@ -620,10 +631,10 @@ class ApiResurceController extends Controller
         ];
 
         foreach ($_POST as $key => $value) {
-            if(in_array($key, $except)){
+            if (in_array($key, $except)) {
                 continue;
             }
-            if(!in_array($key, $cols)){
+            if (!in_array($key, $cols)) {
                 continue;
             }
             $obj->$key = $value;
@@ -631,9 +642,9 @@ class ApiResurceController extends Controller
 
         $success = false;
         $msg = "";
-        if($isEdit){
+        if ($isEdit) {
             $msg = "Updated successfully.";
-        }else{
+        } else {
             $msg = "Created successfully.";
         }
         try {

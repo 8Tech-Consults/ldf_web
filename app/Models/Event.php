@@ -23,6 +23,7 @@ class Event extends Model
             $model->milk = (int)($model->milk);
             $model->district_id = $animal->district_id;
             $model->sub_county_id = $animal->sub_county_id;
+            $model->disease_id = $animal->disease_id;
             $model->owner_id = $animal->owner_id;
             $model->farm_id = $animal->farm_id;
         });
