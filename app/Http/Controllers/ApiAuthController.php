@@ -83,7 +83,7 @@ class ApiAuthController extends Controller
             'id' => $u->id,
             'password' => trim($r->password),
         ]);
-
+        return $this->error('GOOD TO GO!');
 
         if ($token == null) {
             return $this->error('Wrong credentials.');
