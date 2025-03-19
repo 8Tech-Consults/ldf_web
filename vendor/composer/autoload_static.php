@@ -676,6 +676,8 @@ class ComposerStaticInit272137cae038ed0423528f6017c8652c
         'App\\Models\\Location' => __DIR__ . '/../..' . '/app/Models/Location.php',
         'App\\Models\\Media' => __DIR__ . '/../..' . '/app/Models/Media.php',
         'App\\Models\\Notification' => __DIR__ . '/../..' . '/app/Models/Notification.php',
+        'App\\Models\\ParavetRequest' => __DIR__ . '/../..' . '/app/Models/ParavetRequest.php',
+        'App\\Models\\Product' => __DIR__ . '/../..' . '/app/Models/Product.php',
         'App\\Models\\ProductionRecord' => __DIR__ . '/../..' . '/app/Models/ProductionRecord.php',
         'App\\Models\\ServiceProvider' => __DIR__ . '/../..' . '/app/Models/ServiceProvider.php',
         'App\\Models\\Status' => __DIR__ . '/../..' . '/app/Models/Status.php',

@@ -19,7 +19,7 @@ class FinancialRecord extends Model
             if ($acc == null) {
                 throw new \Exception("Farm not found");
             }
-            $model->farmer_id = $acc->owner_id; 
+            $model->farmer_id = $acc->owner_id;
             if ($model->transaction_type == "Expense") {
                 $model->amount = -1 * abs($model->amount);
             } else if ($model->transaction_type == "Income") {
@@ -34,11 +34,24 @@ class FinancialRecord extends Model
 
     public function farm()
     {
-        return $this->belongsTo(Farm::class);
+        return $this->belongsTo(FinanceAccount::class, 'farm_id');
     }
 
     public function recordedBy()
     {
         return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    //farm_text
+    protected $appends = ['farm_text'];
+
+    //getter for farm_text
+    public function getFarmTextAttribute()
+    {
+        $farm = FinanceAccount::find($this->farm_id);
+        if ($farm == null) {
+            return "N/A";
+        }
+        return $farm->name;
     }
 }

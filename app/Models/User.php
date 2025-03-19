@@ -12,10 +12,19 @@ class User extends Administrator
 {
     protected $table = 'admin_users';
 
+    public static function do_update($model)
+    {
+        $model->primary_phone_number = $model->phone_number_1;
+        return $model;
+    }
+
     //boot
     public static function boot()
     {
         parent::boot();
+        static::updating(function ($model) {
+            $model = self::do_update($model);
+        });
         static::creating(function ($model) {
             $phone_number = $model->phone_number_1;
             $phone_number = Utils::prepare_phone_number($phone_number);
@@ -39,7 +48,7 @@ class User extends Administrator
             }
 
             if (strlen($model->username) < 2) {
-                throw new \Exception("Invalid username"); 
+                throw new \Exception("Invalid username");
             }
 
             //get user with same email
@@ -59,6 +68,8 @@ class User extends Administrator
                 throw new \Exception("Sub county not found");
             }
             $model->district_id = $sub_county->parent;
+            $model->name = $model->first_name . " " . $model->last_name;
+            $model = self::do_update($model);
         });
     }
 
@@ -118,5 +129,15 @@ class User extends Administrator
             return "N/A";
         }
         return $sub->name;
+    }
+
+    //getter for name
+    public function getNameAttribute($value)
+    {
+        if ($value == null) {
+            $this->name = $this->first_name . " " . $this->last_name;
+            $this->save();
+        }
+        return $value;
     }
 }

@@ -27,8 +27,7 @@ class BreedController extends AdminController
     {
         $grid = new Grid(new Breed());
 
-        // $grid->column('id', __('Id'));
-        $grid->livestockType()->name('Livestock Type');
+        // $grid->column('id', __('Id')); 
         $grid->column('name', __('Name'));
         $grid->column('description', __('Description'));
         // $grid->column('image', __('Image'));
@@ -60,10 +59,7 @@ class BreedController extends AdminController
     {
         $show = new Show(Breed::findOrFail($id));
 
-        // $show->field('id', __('Id'));
-        $show->field('livestock_type_name', __('Livestock Type'))->as(function ($livestock_type_name) {
-            return $this->livestockType->name;
-        });
+      
         $show->field('name', __('Name'));
         $show->field('description', __('Description'));
         $show->field('image', __('Image'));
@@ -81,8 +77,7 @@ class BreedController extends AdminController
     protected function form()
     {
         $form = new Form(new Breed());
-
-        $form->select('livestock_type_id', __('Livestock Type'))->options(\App\Models\LivestockType::all()->pluck('name', 'id'))->rules('required');
+ ;
         $form->text('name', __('Name'))->rules('required');
         $form->textarea('description', __('Description'));
         $form->image('image', __('Image'));

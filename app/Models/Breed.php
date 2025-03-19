@@ -14,11 +14,6 @@ class Breed extends Model
         return $this->hasMany(Animal::class);
     }
 
-    public function livestockType()
-    {
-        return $this->belongsTo(LivestockType::class);
-    }
-
     public function farms()
     {
         return $this->belongsToMany(Farm::class);

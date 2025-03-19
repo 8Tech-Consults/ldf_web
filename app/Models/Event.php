@@ -28,4 +28,23 @@ class Event extends Model
             $model->farm_id = $animal->farm_id;
         });
     }
+
+    //appends animal_text
+    protected $appends = ['animal_text'];
+
+    //getter for animal_text
+    public function getAnimalTextAttribute()
+    {
+        $animal = Animal::find($this->animal_id);
+        if ($animal == null) {
+            return "N/A";
+        }
+        return $animal->tag_number;
+    }
+
+    //belongs to animal
+    public function animal()
+    {
+        return $this->belongsTo(Animal::class, 'animal_id');
+    }
 }

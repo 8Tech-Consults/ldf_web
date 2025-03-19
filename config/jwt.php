@@ -1,4 +1,4 @@
-cls<?php
+<?php
 
 /*
  * This file is part of jwt-auth.

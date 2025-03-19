@@ -1,9 +1,9 @@
 php artisan migrate
 
-php artisan make:migration create_event_table
+php artisan make:migration create_table_animal_health_records_table
 
-php artisan make:migration add_ccompany_id_to_events --table=events
+php artisan make:migration change_improve_farms --table=farms
  
-php artisan admin:make DiseaseController --model=App\\Models\\Disease
+php artisan admin:make UserController --model=App\Models\User
  
-php artisan make:model FinanceAccount -m
+php artisan make:model UserController -m

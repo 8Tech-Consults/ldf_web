@@ -65,6 +65,8 @@ return array(
     'App\\Models\\Location' => $baseDir . '/app/Models/Location.php',
     'App\\Models\\Media' => $baseDir . '/app/Models/Media.php',
     'App\\Models\\Notification' => $baseDir . '/app/Models/Notification.php',
+    'App\\Models\\ParavetRequest' => $baseDir . '/app/Models/ParavetRequest.php',
+    'App\\Models\\Product' => $baseDir . '/app/Models/Product.php',
     'App\\Models\\ProductionRecord' => $baseDir . '/app/Models/ProductionRecord.php',
     'App\\Models\\ServiceProvider' => $baseDir . '/app/Models/ServiceProvider.php',
     'App\\Models\\Status' => $baseDir . '/app/Models/Status.php',

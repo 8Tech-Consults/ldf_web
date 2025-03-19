@@ -19,7 +19,7 @@ class Farm extends Model
             $model->owner_id = $model->owner_id ?? auth()->user()->id;
             $sub = Location::find($model->location_id);
             if($sub == null){
-                throw new \Exception("Location not found");
+                throw new \Exception("Location not found for #{$model->location_id}"); 
             }
             $model->district_id = $sub->parent;
         });

@@ -6,12 +6,33 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Zebra_Image;
 
 class Utils extends Model
 {
     use HasFactory;
     //delete notification after the form has been viewed
+    public static function checkEventRegustration(){
+
+    }
+
+    static function fetch_post($obj, $except, $data)
+    {
+        $table = $obj->getTable();
+        $columns = Schema::getColumnListing($table);
+        foreach ($columns as $key => $column) {
+            if (in_array($column, $except)) {
+                continue;
+            }
+            if (isset($data[$column])) {
+                $obj->$column = $data[$column];
+            }
+        }
+        return $obj;
+    }
+
+
     public static function delete_notification($model_name, $id)
     {
 
@@ -194,6 +215,8 @@ class Utils extends Model
 
     public static function phone_number_is_valid($phone_number)
     {
+        
+        return true; 
         $phone_number = Utils::prepare_phone_number($phone_number);
         if (substr($phone_number, 0, 4) != "+256") {
             return false;
@@ -226,6 +249,9 @@ class Utils extends Model
 
     public static function docs_root()
     {
+        
+        return public_path() . "";  
+        return $_SERVER['DOCUMENT_ROOT'] . ""; 
         $r = $_SERVER['DOCUMENT_ROOT'] . "";
 
         if (!str_contains($r, 'home/')) {
@@ -284,6 +310,7 @@ class Utils extends Model
 
         return $is_single_file ? $single_file : $uploaded_images;
     }
+    
 
 
     public static function create_thumbail($params = array())

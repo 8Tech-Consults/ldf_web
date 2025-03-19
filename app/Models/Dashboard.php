@@ -76,11 +76,7 @@ class Dashboard extends Model
     public static function livestockBreed() 
     {
         $data = DB::table('locations')
-            ->join('farms', 'locations.id', '=', 'farms.location_id')
-            ->join('breed_farm', 'farms.id', '=', 'breed_farm.farm_id')
-            ->join('breeds', 'breed_farm.breed_id', '=', 'breeds.id')
-            ->select('locations.name as location_name', 'breeds.name as breed_name', DB::raw('COUNT(*) as breed_count'))
-            ->groupBy('locations.name', 'breeds.name')
+     
             ->get();
     
         return view('livestock_breed_chart', compact('data'));

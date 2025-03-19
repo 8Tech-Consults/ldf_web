@@ -53,9 +53,7 @@ class ApiAuthController extends Controller
         if ($r->password == null) {
             return $this->error('Password is required.');
         }
-
-        $r->username = trim($r->username);
-
+ 
         $u = User::where('username', $r->username)
             ->orWhere('id', $r->username)
             ->orWhere('email', $r->username)
@@ -82,8 +80,7 @@ class ApiAuthController extends Controller
         $token = auth('api')->attempt([
             'id' => $u->id,
             'password' => trim($r->password),
-        ]);
-        return $this->error('GOOD TO GO!');
+        ]); 
 
         if ($token == null) {
             return $this->error('Wrong credentials.');

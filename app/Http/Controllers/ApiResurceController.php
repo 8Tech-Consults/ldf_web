@@ -14,6 +14,7 @@ use App\Models\Institution;
 use App\Models\Job;
 use App\Models\Location;
 use App\Models\NewsPost;
+use App\Models\ParavetRequest;
 use App\Models\Person;
 use App\Models\Product;
 use App\Models\Sacco;
@@ -36,10 +37,12 @@ class ApiResurceController extends Controller
     {
         $locations = [];
 
-        foreach (Location::where([
-            'details' => 'Subcounty'
-        ])->orderby('id', 'desc')
-            ->get() as $key => $district) {
+        foreach (
+            Location::where([
+                'details' => 'Subcounty'
+            ])->orderby('id', 'desc')
+                ->get() as $key => $district
+        ) {
             $loc['id'] = $district->id;
             $loc['name'] = $district->name;
             $locations[] = $loc;
@@ -326,45 +329,55 @@ class ApiResurceController extends Controller
     public function product_create(Request $r)
     {
         $u = $r->user;
+        $u = auth('api')->user();
         if ($u == null) {
-            return $this->error('User not found.');
+            return Utils::response([
+                'status' => 0,
+                'message' => "User not found.",
+            ]);
         }
-        if (
-            $r->name == null ||
-            $r->category == null ||
-            $r->price == null
-        ) {
-            return $this->error('Some Information is still missing. Fill the missing information and try again.');
+
+
+
+        $obj = new Product();
+        $except = [];
+        try {
+            $obj = Utils::fetch_post($obj, $except, $r->all());
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
         }
 
         $image = "";
         if (!empty($_FILES)) {
             try {
                 $image = Utils::upload_images_2($_FILES, true);
-                $image = 'images/' . $image;
             } catch (Throwable $t) {
                 $image = "no_image.jpg";
+                return Utils::response([
+                    'status' => 0,
+                    'message' => $t->getMessage(),
+                ]);
             }
         }
 
 
-
-
-        $obj = new Product();
-        $obj->name = $r->name;
-        $obj->administrator_id = $u->id;
-        $obj->type = $r->category;
-        $obj->details = $r->details;
-        $obj->price = $r->price;
-        $obj->offer_type = $r->offer_type;
-        $obj->state = $r->state;
-        $obj->district_id = $r->district_id;
-        $obj->subcounty_id = 1;
-        $obj->photo = $image;
+        //if  $image 
+        if ($image != "" && strlen($image) > 2) {
+            $obj->image = 'images/' . $image;
+        }
+        $obj->provider_id = $u->id;
+        $obj->farmer_id = $u->id;
+        /* 
+        product-create
+        */
 
         try {
             $obj->save();
-            return $this->success(null, $message = "Product Uploaded Sussesfully!", 200);
+            $obj = Product::find($obj->id);
+            if ($obj == null) {
+                return $this->error('Failed to save product, becase ' . $th->getMessage() . '');
+            }
+            return $this->success($obj, $message = "Product Uploaded Sussesfully!", 200);
         } catch (\Throwable $th) {
             return $this->error('Failed to save product, becase ' . $th->getMessage() . '');
             //throw $th;
@@ -577,6 +590,104 @@ class ApiResurceController extends Controller
     }
 
 
+    public function paravet_requests(Request $r)
+    {
+
+        $u = auth('api')->user();
+        if ($u == null) {
+            return Utils::response([
+                'status' => 0,
+                'message' => "User not found.",
+            ]);
+        }
+        $vets = ParavetRequest::where([])
+            ->limit(1000)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return Utils::response([
+            'status' => 1,
+            'data' => $vets,
+            'message' => "Success"
+        ]);
+    }
+
+
+    public function save_paravet_requests(Request $r)
+    {
+
+        $u = auth('api')->user();
+        if ($u == null) {
+            return Utils::response([
+                'status' => 0,
+                'message' => "User not found.",
+            ]);
+        }
+
+        if (!isset($r->task)) {
+            return Utils::response([
+                'status' => 0,
+                'message' => "Task not found.",
+            ]);
+        }
+
+        $except = ['id', 'farmer_id', 'paravet_id', 'district_id'];
+
+        if ($r->task == 'create') {
+            $obj = new ParavetRequest();
+            $obj->farmer_id = $u->id;
+            $obj->district_id = $r->district_id;
+            $obj->status = 'Pending';
+            $obj->review_mail_sent_to_farmer = 'No';
+            $obj->application_mail_sent_to_vet = 'No';
+            $paravet_id = ((int)($r->paravet_id));
+            $paravet = Administrator::find($paravet_id);
+            if ($paravet == null) {
+                return Utils::response([
+                    'status' => 0,
+                    'message' => "Paravet not found.",
+                ]);
+            }
+            $obj->paravet_id = $paravet_id;
+        } else {
+            $obj = ParavetRequest::find($r->id);
+            if ($obj == null) {
+                return Utils::response([
+                    'status' => 0,
+                    'message' => "Request not found.",
+                ]);
+            }
+        }
+
+        try {
+            $obj = Utils::fetch_post($obj, $except, $r->all());
+        } catch (\Throwable $th) {
+            return $this->error($th->getMessage());
+        }
+
+        try {
+            $obj->save();
+        } catch (Exception $e) {
+            return Utils::response([
+                'status' => 0,
+                'data' => null,
+                'message' => $e->getMessage()
+            ]);
+        }
+        $obj = ParavetRequest::find($obj->id);
+        if ($obj == null) {
+            return Utils::response([
+                'status' => 0,
+                'message' => "Request not found.",
+            ]);
+        }
+        return Utils::response([
+            'status' => 1,
+            'data' => $obj,
+            'message' => "Request submited successfully."
+        ]);
+    }
+
     public function update(Request $r, $model)
     {
 
@@ -628,7 +739,21 @@ class ApiResurceController extends Controller
             'user_id',
             'created_by',
             'updated_by',
+            'photo',
+            'image',
         ];
+
+        $UPLOAD_FILE_NAME = null;
+        if (
+            isset($_POST['UPLOAD_FILE_NAME'])  &&
+            $_POST['UPLOAD_FILE_NAME'] != null &&
+            strlen($_POST['UPLOAD_FILE_NAME']) > 2
+        ) {
+            $UPLOAD_FILE_NAME = $_POST['UPLOAD_FILE_NAME'];
+            $except[] = 'UPLOAD_FILE_NAME';
+            $except[] = $UPLOAD_FILE_NAME;
+        }
+
 
         foreach ($_POST as $key => $value) {
             if (in_array($key, $except)) {
@@ -638,6 +763,19 @@ class ApiResurceController extends Controller
                 continue;
             }
             $obj->$key = $value;
+        }
+
+        if ($UPLOAD_FILE_NAME != null) {
+            $image = "";
+            if (!empty($_FILES)) {
+                try {
+                    $image = Utils::upload_images_2($_FILES, true);
+                    $image = 'images/' . $image;
+                } catch (Throwable $t) {
+                    $image = "no_image.jpg";
+                }
+            }
+            $obj->$UPLOAD_FILE_NAME = $image;
         }
 
         $success = false;

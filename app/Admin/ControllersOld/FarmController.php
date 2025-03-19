@@ -117,7 +117,7 @@ class FarmController extends AdminController
     protected function form()
     {
         $form = new Form(new Farm());
-
+ 
         $form->image('profile_picture', __('Farm image'));
         $form->text('name', __('Name'))->rules('required');
          //  //add a get gps coordinate button
