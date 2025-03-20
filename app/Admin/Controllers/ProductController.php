@@ -28,10 +28,8 @@ class ProductController extends AdminController
         $grid->model()->latest();
         $grid->disableCreateButton();
         $grid->disableBatchActions();
-
-        $grid->column('id', __('Id'))->sortable();
-        $grid->column('provider_id', __('Provider id'))->sortable();
-        $grid->column('farmer_id', __('Farmer id'))->sortable();
+ 
+        $grid->column('image', __('Image'))->lightbox(['width' => 50, 'height' => 50]);
         $grid->column('name', __('Name'))->filter('like');
         $grid->column('description', __('Description'))->limit(50);
         $grid->column('manufacturer', __('Manufacturer'))->filter('like');
@@ -45,7 +43,7 @@ class ProductController extends AdminController
             'Active' => 'Active',
             'Inactive' => 'Inactive',
         ]);
-        $grid->column('image', __('Image'))->image('', 50, 50);
+
         $grid->column('stock', __('Stock'))->sortable()->filter('range');
         $grid->column('category', __('Category'))->filter('like');
         $grid->column('created_at', __('Created at'))->sortable()->filter('range', 'date');
@@ -61,9 +59,7 @@ class ProductController extends AdminController
             ]);
             $filter->between('price', __('Price'));
             $filter->between('quantity_available', __('Quantity available'));
-            $filter->between('expiry_date', __('Expiry date'))->date();
-            $filter->between('created_at', __('Created at'))->date();
-            $filter->between('updated_at', __('Updated at'))->date();
+            $filter->between('expiry_date', __('Expiry date'))->date(); 
         });
 
         return $grid;

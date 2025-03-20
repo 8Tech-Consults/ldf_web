@@ -21,4 +21,7 @@ Route::group([
     $router->resource('farm-activities', FarmActivityController::class); 
     $router->resource('paravet-requests', ParavetRequestController::class);
     $router->resource('products', ProductController::class);
+    $router->resource('financial-records', FinancialRecordController::class);
+    $router->resource('finance-accounts', FinanceAccountController::class); 
+
 });
