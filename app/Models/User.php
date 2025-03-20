@@ -15,6 +15,28 @@ class User extends Administrator
     public static function do_update($model)
     {
         $model->primary_phone_number = $model->phone_number_1;
+
+        //if password is not set, do not update it
+        if ($model->passwor == null || strlen($model->password) < 2) {
+            $model->password = '4321';
+        }
+
+        //if password is not hashed, hash it
+        if (strlen($model->password) < 15) {
+            $model->password = bcrypt($model->password);
+        }
+
+        //if username is not set, set it to phone number
+        if (strlen($model->username) < 2) {
+            $model->username = $model->phone_number_1;
+        }
+
+        //if email is not set, set it to username
+        if (strlen($model->email) < 2) {
+            $model->email = $model->username;
+        }
+        
+
         return $model;
     }
 

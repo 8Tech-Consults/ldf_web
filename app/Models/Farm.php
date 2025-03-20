@@ -22,6 +22,8 @@ class Farm extends Model
                 throw new \Exception("Location not found for #{$model->location_id}"); 
             }
             $model->district_id = $sub->parent;
+            $model->location_text = $sub->name;
+            $model->sub_county_text = $sub->name;
         });
     }
 

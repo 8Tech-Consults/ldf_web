@@ -26,8 +26,13 @@ Route::get('auth/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::get('mobile', function () {
-    return url('');
+Route::get('app', function () {
+    $APP_URL = url('app.apk');
+    //set header to be for download
+    header("Content-Type: application/vnd.android.package-archive");
+    header("Content-Disposition: attachment; filename=app.apk");
+    //readfile($APP_URL);
+    return redirect($APP_URL);
 });
 Route::get('test', function () {
     $m = Meeting::find(1);
@@ -163,7 +168,7 @@ Route::get('project-report', function () {
     if ($p == null) {
         die("User not found");
     }
- 
+
 
     $title = $p->name . " " . date("Y-m-d H:i:s");
     $file_name = $title . ".pdf";
@@ -173,10 +178,10 @@ Route::get('project-report', function () {
     $pdf->setOptions(['dpi' => 150, 'defaultFont' => 'open-sans']);
     $pdf->setOptions(['isPhpEnabled' => true, 'isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
-    
+
     $pdf->loadHTML(view('project-report', [
         'item' => $p,
-        'title' => $title, 
+        'title' => $title,
     ])->render());
     return $pdf->stream($file_name);
 });
