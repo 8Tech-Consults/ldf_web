@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
 
     <!-- SEO meta tags -->
-    <title>TaskEase - HR Management System</title>
+    <title>{{ env('APP_NAME') }}</title>
     <meta name="description" content="Humana Resouse Management System - 8technologies consults">
     <meta name="keywords" content="SAAS, HR Systme, 8tech">
     <meta name="author" content="8technologies Consults">
@@ -144,6 +144,25 @@
                 -webkit-transform: none;
                 transform: none;
             }
+        }
+
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+            /* Keeps it behind other content */
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            /* Prevents scrolling */
         }
     </style>
 
