@@ -106,7 +106,6 @@
                                 <i class="glyphicon glyphicon-hourglass me-1 align-middle"></i>
                                 {{ $data['pending_cooperatives'] }}
                             </span>
-                            <a href="{{ admin_url('/cooperatives') }}">{{ __('View Details') }}</a>
                         </p>
                     </div>
                 </div>
@@ -130,7 +129,6 @@
                                 <i class="glyphicon glyphicon-hourglass me-1 align-middle"></i>
                                 {{ $data['pending_input_providers'] }}
                             </span>
-                            <a href="{{ admin_url('/individual-producers') }}">{{ __('View Details') }}</a>
                         </p>
                     </div>
                 </div>
