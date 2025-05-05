@@ -8,28 +8,34 @@
         transition: transform 0.2s ease-in-out;
         overflow: hidden;
     }
+
     .card:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
     }
+
     .card-header {
         background-color: #f8f8f8;
         border-bottom: 1px solid #eee;
         padding: 12px 16px;
     }
+
     .card-header .card-title {
         font-size: 1.2rem;
         margin: 0;
         font-weight: 700;
     }
+
     .card-body {
         padding: 16px;
     }
+
     .card-body h4 {
         margin-bottom: 10px;
         font-size: 1.5rem;
         font-weight: 700;
     }
+
     .card-body p {
         margin-bottom: 0;
         font-size: 0.95rem;
@@ -39,6 +45,7 @@
     .text-danger {
         color: #dc3545 !important;
     }
+
     .fw-bold {
         font-weight: 700;
     }
@@ -47,9 +54,11 @@
     .mb-2 {
         margin-bottom: 0.5rem;
     }
+
     .me-2 {
         margin-right: 0.5rem;
     }
+
     .me-1 {
         margin-right: 0.25rem;
     }
@@ -79,7 +88,6 @@
                                 <i class="glyphicon glyphicon-hourglass me-1 align-middle"></i>
                                 {{ $data['pending_farmers'] }}
                             </span>
-                            <a href="{{ admin_url('/seed-producers') }}">{{ __('View Details') }}</a>
                         </p>
                     </div>
                 </div>
@@ -141,7 +149,6 @@
                                 <i class="glyphicon glyphicon-hourglass me-1 align-middle"></i>
                                 {{ $data['pending_vets'] }}
                             </span>
-                            <a href="{{ admin_url('/vets') }}">{{ __('View Details') }}</a>
                         </p>
                     </div>
                 </div>
